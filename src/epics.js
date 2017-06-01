@@ -1,17 +1,9 @@
+import Rx from 'rxjs';
 import { combineEpics } from 'redux-observable';
 import moment from 'moment';
 
-import Rx from 'rxjs';
+import { PING, PONG, START_ClOCK, INCREMENT_CLOCK, GET_USERS, GET_USERS_RESPONSE } from './actions';
 
-
-
-import { PING, PONG, START_ClOCK, INCREMENT_CLOCK } from './actions';
-
-const tickObservable = Rx.Observable.of(1,2,3)
-  // Observable
-  //   .interval(500)
-  //   .do(() => console.warn('wat'))
-  //   .mapTo({ type: INCREMENT_CLOCK });
 
 const pingEpic = action$ =>
   action$.ofType(PING)
@@ -20,8 +12,26 @@ const pingEpic = action$ =>
 
 const clockEpic = action$ =>
   action$.ofType(START_ClOCK)
-    .mapTo({ type: 'INCREMENT_CLOCK', payload: moment() })
+    .mapTo({ type: INCREMENT_CLOCK, payload: moment() })
     .flatMap(() => Rx.Observable.interval(1000))
-    .map(count => ({ type: 'INCREMENT_CLOCK', payload: moment() }));
+    .map(count => ({ type: INCREMENT_CLOCK, payload: moment() }));
 
-export default combineEpics(pingEpic, clockEpic);
+const getUsersEpic = action$ =>
+  action$.ofType(GET_USERS)
+    .flatMap(() => 
+      Rx.Observable.ajax
+        .getJSON('https://jsonplaceholder.typicode.com/users')
+        .map(response => ({ type: GET_USERS_RESPONSE, payload: response }))
+    )
+
+const getUserEpic = action$ =>
+  action$.ofType('GET_USERS_RESPONSE')
+    .flatMap(action =>
+      Rx.Observable.from(action.payload).flatMap(user =>
+        Rx.Observable.ajax
+          .getJSON(`https://jsonplaceholder.typicode.com/users/${user.id}`)
+          .map(response => ({ type: 'GET_USER_RESPONSE', payload: response })
+      ))
+    );
+
+export default combineEpics(pingEpic, clockEpic, getUsersEpic, getUserEpic);

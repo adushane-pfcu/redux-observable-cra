@@ -20,7 +20,28 @@ const clockReducer = (state = {}, action) => {
   return state;
 };
 
+const usersReducer = (state = {}, action) => {
+  switch (action.type) {
+    case 'GET_USERS_RESPONSE':
+      return action.payload.reduce((acc, user) => ({
+        ...acc,
+        [user.id]: user
+      }), {});
+    case 'GET_USER_RESPONSE':
+      return {
+        ...state,
+        [action.payload.id]: {
+          ...action.payload,
+          fetched: true,
+        },
+      }
+    default:
+      return state;
+  }
+};
+
 export default combineReducers({
   ping: pingReducer,
   clock: clockReducer,
+  users: usersReducer,
 });
