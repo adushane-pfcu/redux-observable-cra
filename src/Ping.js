@@ -10,6 +10,6 @@ const Ping = ({ isPinging, ping }) => (
 );
 
 export default connect(
-  ({ isPinging }) => ({ isPinging }),
+  ({ ping: { isPinging } }) => ({ isPinging }),
   { ping }
 )(Ping);

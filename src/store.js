@@ -1,13 +1,17 @@
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import { pingEpic } from './epics';
-import { pingReducer } from './reducers';
+import rootEpic from './epics';
+import rootReducer from './reducers';
 
-const epicMiddleware = createEpicMiddleware(pingEpic);
+const epicMiddleware = createEpicMiddleware(rootEpic);
+
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const store = createStore(
-  pingReducer,
-  applyMiddleware(epicMiddleware)
+  rootReducer,
+  composeEnhancers(
+    applyMiddleware(epicMiddleware)
+  ),
 );
 
 export default store;

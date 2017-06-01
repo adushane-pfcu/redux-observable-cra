@@ -1,6 +1,8 @@
+import { combineReducers } from 'redux';
+
 import { PING, PONG } from './actions';
 
-export const pingReducer = (state = { isPinging: false }, action) => {
+const pingReducer = (state = { isPinging: false }, action) => {
   switch (action.type) {
     case PING:
       return { isPinging: true };
@@ -10,3 +12,15 @@ export const pingReducer = (state = { isPinging: false }, action) => {
       return state;
   }
 };
+
+const clockReducer = (state = {}, action) => {
+  if (action.type === 'INCREMENT_CLOCK') {
+    return { currentTime: action.payload };
+  }
+  return state;
+};
+
+export default combineReducers({
+  ping: pingReducer,
+  clock: clockReducer,
+});
